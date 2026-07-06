@@ -6,6 +6,7 @@ const K = {
   sessions: 'll_sessions',
   draft: 'll_draft',
   feedback: 'll_feedback',
+  checkins: 'll_checkins',
 };
 
 // ---- storage ----------------------------------------------------------
@@ -29,9 +30,13 @@ if (!program || (program.version || 0) < PROGRAM_VERSION) {
 let sessions = loadJSON(K.sessions, []);
 let feedback = loadJSON(K.feedback, []);
 let draft    = loadJSON(K.draft, null);
+let checkins = loadJSON(K.checkins, []);
 
 let view = { name: 'today' };   // today | workout | history | guide | feedback | edit
 let editDraft = null;           // working copy while editing a workout
+let ciDraft = { energy: null, legs: null, back: null, note: '' };
+let ciEditing = false;
+let restTimer = null;           // { endsAt, label, fired, hideAt }
 
 // ---- dates / weeks ----------------------------------------------------
 function todayISO() {
@@ -103,6 +108,118 @@ function bestFor(exId) {
   return best;
 }
 
+// ---- rest timer ---------------------------------------------------------
+let actx = null;
+function initAudio() {
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === 'suspended') actx.resume();
+  } catch (e) {}
+}
+function beep() {
+  try {
+    if (!actx) return;
+    [0, 0.35].forEach(t => {
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.connect(g); g.connect(actx.destination);
+      o.frequency.value = 880;
+      g.gain.setValueAtTime(0.25, actx.currentTime + t);
+      g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + t + 0.28);
+      o.start(actx.currentTime + t); o.stop(actx.currentTime + t + 0.3);
+    });
+  } catch (e) {}
+}
+function startTimer(ex) {
+  if (!ex.rest) return;
+  initAudio();
+  restTimer = { endsAt: Date.now() + ex.rest * 1000, label: ex.name, fired: false };
+  if (!startTimer._iv) startTimer._iv = setInterval(timerTick, 400);
+  timerTick();
+}
+function timerTick() {
+  const bar = document.getElementById('timerbar');
+  if (!bar) return;
+  if (!restTimer) { bar.classList.add('hidden'); return; }
+  const rem = Math.ceil((restTimer.endsAt - Date.now()) / 1000);
+  bar.classList.remove('hidden');
+  if (rem <= 0) {
+    if (!restTimer.fired) {
+      restTimer.fired = true;
+      restTimer.hideAt = Date.now() + 6000;
+      beep();
+      bar.classList.add('done');
+      document.getElementById('timer-time').textContent = 'GO';
+      document.getElementById('timer-label').textContent = 'Rest done — next set';
+    }
+    if (Date.now() > (restTimer.hideAt || 0)) {
+      restTimer = null;
+      bar.classList.add('hidden');
+      bar.classList.remove('done');
+    }
+    return;
+  }
+  bar.classList.remove('done');
+  document.getElementById('timer-time').textContent = Math.floor(rem / 60) + ':' + String(rem % 60).padStart(2, '0');
+  document.getElementById('timer-label').textContent = restTimer.label;
+}
+
+// ---- next-weight suggestion ----------------------------------------------
+const NO_SUGGEST = ['drills', 'snatch', 'cleanjerk', 'frontsquat', 'boxjump', 'mcgill'];
+function suggestFor(ex) {
+  if (!ex || ex.core || NO_SUGGEST.indexOf(ex.id) >= 0) return null;
+  const m = String(ex.reps).match(/^(\d+)(?:\s*[–—-]\s*(\d+))?$/);
+  if (!m) return null;
+  const lo = +m[1], hi = +(m[2] || m[1]);
+  for (let i = sessions.length - 1; i >= 0; i--) {
+    const e = sessions[i].entries && sessions[i].entries[ex.id];
+    if (!e) continue;
+    const real = (e.sets || []).filter(s => s.w !== '' && s.r !== '' && !isNaN(parseFloat(s.w)) && !isNaN(parseInt(s.r, 10)));
+    if (!real.length) continue;
+    const w = Math.max(...real.map(s => parseFloat(s.w)));
+    const top = real.filter(s => parseFloat(s.w) === w);
+    const minR = Math.min(...top.map(s => parseInt(s.r, 10)));
+    const inc = ['squat', 'rdl', 'legpress'].indexOf(ex.id) >= 0 ? 10 : 5;
+    const gated = ['squat', 'rdl'].indexOf(ex.id) >= 0;
+    if (minR >= hi) {
+      if (gated && sessions[i].pain != null && sessions[i].pain > 2) {
+        return 'hold ' + w + ' lb — pain was ' + sessions[i].pain + '/10 last time';
+      }
+      return 'try ' + (w + inc) + ' lb (you hit ' + w + '×' + minR + ')';
+    }
+    if (minR >= lo) return w + ' lb again — add a rep (last: ' + w + '×' + minR + ')';
+    return 'hold ' + w + ' lb, own ' + lo + '+ reps first';
+  }
+  return null;
+}
+
+// ---- plate calculator ------------------------------------------------------
+function plateCalc() {
+  const tEl = document.getElementById('plate-target');
+  const out = document.getElementById('plate-result');
+  if (!tEl || !out) return;
+  const t = parseFloat(tEl.value);
+  const bar = parseFloat(document.getElementById('plate-bar').value);
+  if (isNaN(t) || t < bar) {
+    out.innerHTML = '<span class="sub">Enter a total weight of ' + bar + ' lb or more</span>';
+    return;
+  }
+  let per = (t - bar) / 2;
+  const list = [];
+  [45, 35, 25, 10, 5, 2.5].forEach(p => {
+    const n = Math.floor(per / p + 1e-9);
+    if (n > 0) { list.push(n > 1 ? p + '×' + n : String(p)); per -= n * p; }
+  });
+  per = Math.round(per * 100) / 100;
+  out.innerHTML = '<b>Per side:</b> ' + (list.length ? list.join(' · ') : 'empty bar') +
+    (per > 0 ? '<br><span class="sub">' + (per * 2) + ' lb unloadable — closest is ' + (t - per * 2) + ' lb</span>' : '');
+}
+
+// ---- daily check-ins ---------------------------------------------------------
+function todaysCheckin() {
+  const d = todayISO();
+  return checkins.find(c => c.date === d) || null;
+}
+
 // ---- draft ------------------------------------------------------------
 function newDraft(workoutId) {
   const w = getWorkout(workoutId);
@@ -159,6 +276,14 @@ function buildExport() {
     if (sn.note) lines.push('  Session feedback: “' + sn.note + '”');
     lines.push('');
   });
+  lines.push('== DAILY CHECK-INS ==');
+  if (!checkins.length) lines.push('(none yet)');
+  checkins.slice(-14).forEach(c => {
+    lines.push('[' + c.date + '] energy ' + (c.energy != null ? c.energy : '–') + '/5 · legs ' +
+      (c.legs != null ? c.legs : '–') + '/5 · back ' + (c.back != null ? c.back : '–') + '/10' +
+      (c.note ? ' — “' + c.note + '”' : ''));
+  });
+  lines.push('');
   lines.push('== GENERAL FEEDBACK ==');
   if (!feedback.length) lines.push('(none yet)');
   feedback.slice(-15).forEach(f => lines.push('[' + f.date + '] ' + f.text));
@@ -239,6 +364,30 @@ function renderToday() {
   }
   h += '</section>';
 
+  // daily check-in
+  const ci = todaysCheckin();
+  if (ci && !ciEditing) {
+    h += '<section class="card"><div class="kicker">Daily check-in ✓</div>' +
+      '<div class="ci-compact"><span class="grow">⚡ Energy ' + (ci.energy != null ? ci.energy + '/5' : '–') +
+      ' · 🦵 Legs ' + (ci.legs != null ? ci.legs + '/5' : '–') +
+      ' · 🔙 Back ' + (ci.back != null ? ci.back + '/10' : '–') + '</span>' +
+      '<button class="btn ghost sm" data-act="ciedit">Edit</button></div>' +
+      (ci.note ? '<p class="hnote">“' + esc(ci.note) + '”</p>' : '') +
+      '</section>';
+  } else {
+    h += '<section class="card"><div class="kicker">Daily check-in — 10 seconds, feeds the Claude export</div>';
+    h += '<div class="ci-lab">⚡ Energy (1 = dead, 5 = charged)</div><div class="ci-row">';
+    for (let i = 1; i <= 5; i++) h += '<button class="pain' + (ciDraft.energy === i ? ' on' : '') + '" data-act="ciset" data-f="energy" data-n="' + i + '">' + i + '</button>';
+    h += '</div><div class="ci-lab">🦵 Legs (1 = wrecked, 5 = fresh)</div><div class="ci-row">';
+    for (let i = 1; i <= 5; i++) h += '<button class="pain' + (ciDraft.legs === i ? ' on' : '') + '" data-act="ciset" data-f="legs" data-n="' + i + '">' + i + '</button>';
+    h += '</div><div class="ci-lab">🔙 Back right now (0 = silent)</div><div class="ci-row">';
+    for (let i = 0; i <= 10; i++) h += '<button class="pain' + (ciDraft.back === i ? ' on' : '') + '" data-act="ciset" data-f="back" data-n="' + i + '">' + i + '</button>';
+    h += '</div>';
+    h += '<input type="text" class="ci-note" id="citext" placeholder="Anything worth noting — sleep, soreness, hockey load…" value="' + esc(ciDraft.note) + '">';
+    h += '<div class="finishrow tight"><button class="btn primary" data-act="cisave">Save check-in</button>' +
+      (ciEditing ? '<button class="btn ghost" data-act="cicancel">Cancel</button>' : '') + '</div></section>';
+  }
+
   // all workouts
   h += '<div class="kicker pad">All workouts</div><div class="wgrid">';
   program.workouts.forEach(w => {
@@ -276,6 +425,7 @@ function renderWorkout() {
   let h = '<header class="page-head">' +
     '<button class="btn ghost back" data-act="back">‹</button>' +
     '<div class="grow"><h1>' + esc(w.name) + '</h1><p class="sub">' + esc(w.where) + ' · ' + weekLabel(draft.week) + '</p></div>' +
+    '<button class="btn ghost" data-act="plates">◎ Plates</button>' +
     '</header>';
 
   h += '<div class="card hintcard">🎯 <b>' + esc(progressionFor(draft.week).label) + ':</b> ' + esc(hint) + '</div>';
@@ -325,6 +475,7 @@ function renderExercise(ex) {
     '<div class="grow"><h3>' + esc(ex.name) + (ex.core ? ' <span class="chip">core</span>' : '') + '</h3>' +
     '<p class="target">' + ex.sets + ' × ' + esc(ex.reps) + '</p>' +
     (last ? '<p class="last">Last: ' + esc(last.summary) + (best ? ' · Best: ' + best : '') + '</p>' : '') +
+    (function () { const sg = suggestFor(ex); return sg ? '<p class="suggest">🎯 ' + esc(sg) + '</p>' : ''; })() +
     '</div></div>';
 
   h += '<details class="tip"><summary>💡 Tips &amp; video</summary>' +
@@ -477,6 +628,7 @@ function renderEdit() {
       Object.keys(ART).map(k => '<option value="' + k + '"' + (ex.art === k ? ' selected' : '') + '>' + k + '</option>').join('') +
       '</select></label>' +
       '<label>Location <input type="text" value="' + esc(ex.loc || '') + '" data-ebind="loc" data-i="' + i + '"></label>' +
+      '<label>Rest (sec) <input type="number" min="0" max="600" step="15" value="' + (ex.rest || 0) + '" data-ebind="rest" data-i="' + i + '"></label>' +
       '</div>' +
       '<label class="editfull">Tip<textarea data-ebind="tip" data-i="' + i + '">' + esc(ex.tip || '') + '</textarea></label>' +
       '<label class="editfull">Video link<input type="text" value="' + esc(ex.video || '') + '" data-ebind="video" data-i="' + i + '"></label>' +
@@ -508,8 +660,19 @@ const ACTIONS = {
   resume()   { view = { name: 'workout' }; render(); },
   back()     { view = { name: 'today' }; render(); },
   done(el)   {
-    const s = draft.entries[el.dataset.ex].sets[+el.dataset.i];
+    const exId = el.dataset.ex;
+    const s = draft.entries[exId].sets[+el.dataset.i];
     s.done = !s.done;
+    if (s.done) {
+      const w = getWorkout(draft.workoutId);
+      const ex = w && w.exercises.find(x => x.id === exId);
+      const wt = parseFloat(s.w);
+      const best = bestFor(exId);
+      if (!isNaN(wt) && best !== null && wt > best) {
+        toast('🎉 PR — ' + (ex ? ex.name : exId) + ' ' + wt + ' lb (previous best ' + best + ')');
+      }
+      if (ex) startTimer(ex);
+    }
     saveDraft(); render();
   },
   addset(el) {
@@ -530,6 +693,7 @@ const ACTIONS = {
     sessions.push(Object.assign({ id: newId() }, draft));
     saveJSON(K.sessions, sessions);
     draft = null; saveDraft();
+    restTimer = null; timerTick();
     view = { name: 'history' };
     render();
     toast('Session saved 💪');
@@ -537,8 +701,41 @@ const ACTIONS = {
   discard()  {
     if (!confirm('Discard this session? Logged sets will be lost.')) return;
     draft = null; saveDraft();
+    restTimer = null; timerTick();
     view = { name: 'today' };
     render();
+  },
+  timeradd() {
+    if (!restTimer) return;
+    if (restTimer.fired) { restTimer.endsAt = Date.now() + 30000; restTimer.fired = false; }
+    else restTimer.endsAt += 30000;
+    timerTick();
+  },
+  timerx()   { restTimer = null; timerTick(); },
+  plates()   { document.getElementById('platemodal').classList.remove('hidden'); plateCalc(); },
+  platesclose() { document.getElementById('platemodal').classList.add('hidden'); },
+  noop()     {},
+  ciset(el)  { ciDraft[el.dataset.f] = +el.dataset.n; render(); },
+  ciedit()   {
+    const ci = todaysCheckin();
+    ciDraft = { energy: ci.energy, legs: ci.legs, back: ci.back, note: ci.note || '' };
+    ciEditing = true;
+    render();
+  },
+  cicancel() { ciEditing = false; ciDraft = { energy: null, legs: null, back: null, note: '' }; render(); },
+  cisave()   {
+    if (ciDraft.energy == null && ciDraft.legs == null && ciDraft.back == null && !ciDraft.note.trim()) {
+      toast('Tap a number first'); return;
+    }
+    const d = todayISO();
+    checkins = checkins.filter(c => c.date !== d);
+    checkins.push({ id: newId(), date: d, energy: ciDraft.energy, legs: ciDraft.legs, back: ciDraft.back, note: ciDraft.note.trim() });
+    checkins.sort((a, b) => a.date < b.date ? -1 : 1);
+    saveJSON(K.checkins, checkins);
+    ciEditing = false;
+    ciDraft = { energy: null, legs: null, back: null, note: '' };
+    render();
+    toast('Checked in ✓');
   },
   delsession(el) {
     if (!confirm('Delete this session from history?')) return;
@@ -568,7 +765,7 @@ const ACTIONS = {
     navigator.share({ title: 'Lift Log export', text: buildExport() }).catch(() => {});
   },
   backup() {
-    const blob = new Blob([JSON.stringify({ program, sessions, feedback }, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({ program, sessions, feedback, checkins }, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = 'liftlog-backup-' + todayISO() + '.json';
@@ -584,7 +781,7 @@ const ACTIONS = {
   canceledit() { editDraft = null; view = { name: 'today' }; render(); },
   addex()    {
     editDraft.exercises.push({
-      id: newId(), name: 'New exercise', sets: 3, reps: '10', art: 'bar',
+      id: newId(), name: 'New exercise', sets: 3, reps: '8', art: 'bar', rest: 90,
       loc: editDraft.exercises.length ? editDraft.exercises[editDraft.exercises.length - 1].loc : '',
       tip: '', video: '',
     });
@@ -640,22 +837,33 @@ document.addEventListener('input', e => {
   } else if (bind === 'session-note' && draft) {
     draft.note = el.value;
     saveDraft();
+  } else if (el.id === 'citext') {
+    ciDraft.note = el.value;
+  } else if (el.id === 'plate-target' || el.id === 'plate-bar') {
+    plateCalc();
   } else if (el.dataset.ebind && editDraft) {
     const ex = editDraft.exercises[+el.dataset.i];
     const f = el.dataset.ebind;
-    ex[f] = f === 'sets' ? Math.max(1, parseInt(el.value, 10) || 1) : el.value;
+    if (f === 'sets') ex[f] = Math.max(1, parseInt(el.value, 10) || 1);
+    else if (f === 'rest') ex[f] = Math.max(0, parseInt(el.value, 10) || 0);
+    else ex[f] = el.value;
   }
 });
 
 document.addEventListener('change', e => {
+  if (e.target.id === 'plate-bar') { plateCalc(); return; }
+  if (e.target.dataset && e.target.dataset.ebind && editDraft && e.target.tagName === 'SELECT') {
+    editDraft.exercises[+e.target.dataset.i][e.target.dataset.ebind] = e.target.value;
+    return;
+  }
   if (e.target.id === 'importfile' && e.target.files.length) {
     const fr = new FileReader();
     fr.onload = () => {
       try {
         const data = JSON.parse(fr.result);
         if (!data.program || !Array.isArray(data.sessions)) throw new Error('bad file');
-        program = data.program; sessions = data.sessions; feedback = data.feedback || [];
-        saveJSON(K.program, program); saveJSON(K.sessions, sessions); saveJSON(K.feedback, feedback);
+        program = data.program; sessions = data.sessions; feedback = data.feedback || []; checkins = data.checkins || [];
+        saveJSON(K.program, program); saveJSON(K.sessions, sessions); saveJSON(K.feedback, feedback); saveJSON(K.checkins, checkins);
         render();
         toast('Backup imported');
       } catch (err) { toast('Couldn’t read that file'); }

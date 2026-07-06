@@ -200,8 +200,44 @@
   .tabbar button span { display: block; font-size: 21px; margin-bottom: 2px; }
   .tabbar button.on { color: var(--accent); }
 
+  /* ── rest timer ── */
+  #timerbar { position: fixed; left: 50%; transform: translateX(-50%);
+    bottom: calc(76px + env(safe-area-inset-bottom)); z-index: 55;
+    background: var(--card2); border: 1px solid var(--accent-dim); border-radius: 30px;
+    display: flex; gap: 10px; align-items: center; padding: 7px 8px 7px 18px;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.5); white-space: nowrap; }
+  #timerbar.hidden { display: none; }
+  #timerbar.done { border-color: var(--good); }
+  #timer-time { font-variant-numeric: tabular-nums; font-size: 19px; color: var(--accent); min-width: 46px; text-align: center; }
+  #timerbar.done #timer-time { color: var(--good); }
+  #timer-label { max-width: 150px; overflow: hidden; text-overflow: ellipsis; color: var(--ink2); font-size: 13px; }
+
+  /* ── suggestion chip ── */
+  .suggest { margin: 4px 0 0; color: var(--good); font-size: 12.5px; font-weight: 700; }
+
+  /* ── plate modal ── */
+  #platemodal { position: fixed; inset: 0; background: rgba(10,8,7,0.6); z-index: 70;
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+    -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+  #platemodal.hidden { display: none; }
+  .pm-card { background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+    padding: 18px; width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 14px; }
+  .pm-row { display: flex; gap: 8px; }
+  .pm-row input, .pm-row select { flex: 1; min-width: 0; background: var(--card2);
+    border: 1px solid var(--line); border-radius: 10px; color: var(--ink); padding: 12px; font-size: 16px; }
+  .pm-result { font-size: 17px; line-height: 1.5; min-height: 26px; }
+
+  /* ── daily check-in ── */
+  .ci-lab { font-size: 11.5px; color: var(--ink2); font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; margin: 8px 0 6px; }
+  .ci-row { display: flex; gap: 5px; flex-wrap: wrap; }
+  .ci-note { width: 100%; margin-top: 10px; background: transparent; border: none;
+    border-bottom: 1px dashed var(--line); color: var(--ink); padding: 8px 2px; font-size: 14.5px; }
+  .ci-note:focus { outline: none; border-color: var(--accent-dim); }
+  .ci-compact { display: flex; align-items: center; gap: 10px; font-size: 15px; }
+
   /* ── toast ── */
-  #toast { position: fixed; left: 50%; bottom: calc(84px + env(safe-area-inset-bottom));
+  #toast { position: fixed; left: 50%; bottom: calc(136px + env(safe-area-inset-bottom));
     transform: translateX(-50%) translateY(16px); background: var(--ink); color: var(--bg);
     padding: 11px 20px; border-radius: 24px; font-size: 14.5px; font-weight: 700;
     opacity: 0; pointer-events: none; transition: all 0.25s ease; z-index: 60; white-space: nowrap; }
@@ -221,6 +257,29 @@
   </nav>
 
   <div id="toast"></div>
+
+  <div id="timerbar" class="hidden">
+    <span id="timer-label"></span>
+    <b id="timer-time"></b>
+    <button class="btn sm" data-act="timeradd">+30s</button>
+    <button class="btn ghost sm" data-act="timerx">✕</button>
+  </div>
+
+  <div id="platemodal" class="hidden" data-act="platesclose">
+    <div class="pm-card" data-act="noop">
+      <div class="kicker">Plate calculator</div>
+      <div class="pm-row">
+        <input type="number" id="plate-target" inputmode="decimal" step="5" min="0" placeholder="Total weight (lb)">
+        <select id="plate-bar">
+          <option value="45">45 lb bar</option>
+          <option value="35">35 lb bar</option>
+          <option value="15">15 lb bar</option>
+        </select>
+      </div>
+      <div id="plate-result" class="pm-result"><span class="sub">Enter a weight</span></div>
+      <button class="btn" data-act="platesclose">Close</button>
+    </div>
+  </div>
 
   <script src="data.js"></script>
   <script src="art.js"></script>
