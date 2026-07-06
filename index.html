@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lift Log</title>
+<meta name="description" content="Hybrid training block — push/pull/legs/oly tracker">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#141110">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lift Log">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-180.png">
+<style>
+  :root {
+    --bg: #141110;
+    --card: #1e1a17;
+    --card2: #262019;
+    --ink: #ede8df;
+    --ink2: #b6ad9e;
+    --accent: #f5a524;
+    --accent-dim: #7a5410;
+    --line: #322c26;
+    --good: #57d98a;
+    --bad: #e05f5f;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body { padding: env(safe-area-inset-top) 0 0 0; }
+
+  #app { max-width: 720px; margin: 0 auto; padding: 14px 14px 110px 14px; }
+
+  /* ── header ── */
+  .page-head { display: flex; align-items: center; gap: 12px; margin: 6px 0 14px; }
+  .page-head h1 { margin: 0; font-size: 26px; letter-spacing: -0.3px; }
+  .sub { margin: 2px 0 0; color: var(--ink2); font-size: 13.5px; line-height: 1.35; }
+  .grow { flex: 1; min-width: 0; }
+  .weekpill { background: var(--card2); border: 1px solid var(--line); border-radius: 12px;
+    padding: 8px 12px; font-weight: 700; font-size: 14px; color: var(--accent); text-align: center; }
+  .weekpill span { display: block; font-weight: 400; font-size: 11px; color: var(--ink2); }
+  .back { font-size: 26px; line-height: 1; padding: 6px 14px; }
+
+  /* ── cards ── */
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 14px; margin-bottom: 12px; }
+  .kicker { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.09em;
+    color: var(--ink2); font-weight: 700; margin-bottom: 8px; }
+  .kicker.pad { margin: 18px 4px 8px; }
+  .empty { color: var(--ink2); text-align: center; padding: 28px 16px; line-height: 1.5; }
+
+  /* ── buttons ── */
+  .btn { background: var(--card2); color: var(--ink); border: 1px solid var(--line);
+    border-radius: 12px; padding: 10px 16px; font-size: 15px; font-weight: 600;
+    cursor: pointer; min-height: 44px; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #17110a; }
+  .btn.ghost { background: transparent; }
+  .btn.sm { padding: 6px 12px; min-height: 36px; font-size: 13.5px; }
+  .btn.big { padding: 14px 26px; font-size: 17px; }
+  .btn:disabled { opacity: 0.35; }
+  .btn.del { color: var(--bad); }
+
+  /* ── today ── */
+  .resume { border-color: var(--accent-dim); background: linear-gradient(0deg, var(--card), #2a2113);
+    cursor: pointer; font-size: 15px; }
+  .today-card { border-color: var(--accent-dim); }
+  .today-row { display: flex; align-items: center; gap: 14px; }
+  .today-art { width: 110px; flex: none; }
+  .today-row h2 { margin: 0; font-size: 22px; }
+  .restlabel { margin: 4px 0; font-size: 19px; }
+  .wgrid .wcard { display: flex; align-items: center; gap: 12px; }
+  .wcard-art { width: 84px; flex: none; }
+  .wcard-btns { display: flex; gap: 6px; flex: none; }
+  .weekstrip { padding: 6px 14px; }
+  .ws-row { display: flex; gap: 10px; align-items: baseline; padding: 8px 0;
+    border-bottom: 1px solid var(--line); font-size: 14px; }
+  .ws-row:last-child { border-bottom: none; }
+  .ws-row.now { color: var(--accent); font-weight: 700; }
+  .ws-day { width: 38px; flex: none; font-weight: 700; }
+  .ws-where { color: var(--ink2); font-size: 12.5px; flex: none; }
+  .ws-row.now .ws-where { color: var(--accent); }
+
+  /* ── workout session ── */
+  .hintcard { font-size: 14px; line-height: 1.45; border-color: var(--accent-dim); }
+  .warmup summary { font-weight: 700; cursor: pointer; font-size: 15px; }
+  .warmup ul { margin: 10px 0 2px; padding-left: 20px; color: var(--ink2); line-height: 1.7; font-size: 14.5px; }
+  .locdiv { text-align: center; font-weight: 700; color: var(--accent); font-size: 14px;
+    margin: 16px 0 10px; letter-spacing: 0.02em; }
+  .locdiv.first { color: var(--ink2); }
+  .excard { padding: 12px 14px; }
+  .exhead { display: flex; gap: 12px; align-items: center; }
+  .exart { width: 100px; flex: none; background: var(--card2); border-radius: 12px; padding: 4px; }
+  .exart.sm { width: 56px; padding: 2px; }
+  .exhead h3 { margin: 0; font-size: 17px; line-height: 1.25; }
+  .target { margin: 3px 0 0; color: var(--accent); font-weight: 700; font-size: 14px; }
+  .last { margin: 3px 0 0; color: var(--ink2); font-size: 12.5px; }
+  .chip { background: var(--card2); border: 1px solid var(--line); color: var(--ink2);
+    font-size: 10.5px; padding: 2px 7px; border-radius: 20px; vertical-align: 2px;
+    font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+  .tip { margin-top: 8px; }
+  .tip summary { color: var(--ink2); font-size: 13.5px; cursor: pointer; font-weight: 600; }
+  .tip p { margin: 8px 0; font-size: 14.5px; line-height: 1.5; color: var(--ink); }
+  .vlink { display: inline-block; color: var(--accent); font-weight: 700; font-size: 14px;
+    text-decoration: none; padding: 6px 0; }
+
+  .sets { margin-top: 10px; display: flex; flex-direction: column; gap: 7px; }
+  .setrow { display: flex; align-items: center; gap: 8px; }
+  .setrow.donerow input { opacity: 0.6; }
+  .setn { width: 20px; text-align: center; color: var(--ink2); font-weight: 700; font-size: 13px; flex: none; }
+  .setrow input { width: 100%; max-width: 130px; background: var(--card2); border: 1px solid var(--line);
+    color: var(--ink); border-radius: 10px; padding: 10px 12px; font-size: 16px; min-height: 44px; }
+  .setrow .x { color: var(--ink2); flex: none; }
+  input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+  .donebtn { flex: none; width: 46px; min-height: 44px; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--card2); color: var(--ink2); font-size: 18px; cursor: pointer; }
+  .donebtn.on { background: var(--good); border-color: var(--good); color: #10281a; font-weight: 800; }
+  .setbtns { display: flex; gap: 8px; margin-top: 9px; }
+  .exnote { width: 100%; margin-top: 9px; background: transparent; border: none;
+    border-bottom: 1px dashed var(--line); color: var(--ink); padding: 8px 2px; font-size: 14.5px; }
+  .exnote::placeholder, textarea::placeholder, input::placeholder { color: #6e6759; }
+  .exnote:focus, .setrow input:focus, textarea:focus { outline: none; border-color: var(--accent-dim); }
+
+  .painrow { display: flex; gap: 5px; flex-wrap: wrap; }
+  .pain { width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--card2); color: var(--ink2); font-size: 15px; font-weight: 700; cursor: pointer; }
+  .pain.on { background: var(--accent); border-color: var(--accent); color: #17110a; }
+
+  textarea { width: 100%; min-height: 84px; background: var(--card2); border: 1px solid var(--line);
+    border-radius: 12px; color: var(--ink); padding: 12px; font-size: 16px; font-family: inherit;
+    resize: vertical; }
+  .finishrow { display: flex; gap: 10px; justify-content: flex-end; align-items: center;
+    margin: 18px 0 8px; }
+  .finishrow.tight { margin: 10px 0 0; justify-content: flex-start; }
+
+  /* ── history ── */
+  .hcard { padding: 12px 14px; }
+  .hhead { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .hhead b { font-size: 16px; }
+  .hhead .del { margin-left: auto; }
+  .hrow { display: flex; gap: 10px; padding: 5px 0; font-size: 14px; border-bottom: 1px solid var(--line); }
+  .hrow:last-child { border-bottom: none; }
+  .hex { color: var(--ink2); flex: none; width: 41%; }
+  .hsets { flex: 1; line-height: 1.4; }
+  .hnote { color: var(--ink2); font-size: 13.5px; padding: 4px 0 2px; font-style: italic; }
+  .hnote.session { color: var(--accent); }
+  .fbody { margin: 4px 0 0; font-size: 15px; line-height: 1.5; white-space: pre-wrap; }
+
+  /* ── guide ── */
+  .prog b { font-size: 15px; }
+  .prog.now { border-color: var(--accent-dim); }
+  .prog.now b { color: var(--accent); }
+  ul.plain { margin: 0; padding-left: 20px; line-height: 1.65; font-size: 14.5px; }
+  .routine summary { cursor: pointer; font-size: 15px; }
+  .routine .checks { list-style: none; margin: 10px 0 2px; padding: 0; }
+  .routine .checks li { padding: 7px 0; border-bottom: 1px solid var(--line); }
+  .routine .checks li:last-child { border-bottom: none; }
+  .routine .checks label { display: flex; gap: 10px; align-items: flex-start; font-size: 14.5px;
+    line-height: 1.45; cursor: pointer; }
+  .routine .checks input { width: 20px; height: 20px; accent-color: var(--accent); flex: none; margin-top: 1px; }
+  .routine .checks input:checked + span { color: var(--ink2); text-decoration: line-through; }
+  .exportcard { border-color: var(--accent-dim); }
+
+  /* ── edit ── */
+  .editcard { padding: 12px; }
+  .editrow1 { display: flex; gap: 10px; align-items: center; }
+  .editname { flex: 1; min-width: 0; background: var(--card2); border: 1px solid var(--line);
+    border-radius: 10px; color: var(--ink); padding: 10px 12px; font-size: 16px; font-weight: 600; }
+  .editrow2 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .editrow2 label, .editfull { display: block; font-size: 11.5px; color: var(--ink2);
+    text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+  .editrow2 input, .editrow2 select, .editfull input, .editfull textarea { display: block; width: 100%;
+    margin-top: 4px; background: var(--card2); border: 1px solid var(--line); border-radius: 10px;
+    color: var(--ink); padding: 9px 10px; font-size: 15px; font-weight: 400; text-transform: none;
+    letter-spacing: 0; font-family: inherit; }
+  .editfull { margin-top: 10px; }
+  .editfull textarea { min-height: 60px; }
+  @media (max-width: 540px) { .editrow2 { grid-template-columns: 1fr 1fr; } }
+
+  /* ── art ── */
+  .art { display: block; width: 100%; height: auto; }
+  .art line, .art path, .art polyline, .art circle {
+    fill: none; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+  .art .s { stroke: var(--ink2); }
+  .art .a { stroke: var(--accent); }
+  .art .gd { stroke: var(--line); stroke-width: 2.6; }
+  .art .hd { fill: var(--ink2); stroke: none; }
+  .art .af { fill: var(--accent); stroke: none; }
+
+  /* ── tab bar ── */
+  .tabbar { position: fixed; bottom: 0; left: 0; right: 0; display: flex;
+    background: rgba(20, 17, 16, 0.92); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    border-top: 1px solid var(--line);
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); z-index: 50; }
+  .tabbar button { flex: 1; background: none; border: none; color: var(--ink2);
+    font-size: 11.5px; font-weight: 700; padding: 7px 0 5px; cursor: pointer; border-radius: 12px;
+    font-family: inherit; }
+  .tabbar button span { display: block; font-size: 21px; margin-bottom: 2px; }
+  .tabbar button.on { color: var(--accent); }
+
+  /* ── toast ── */
+  #toast { position: fixed; left: 50%; bottom: calc(84px + env(safe-area-inset-bottom));
+    transform: translateX(-50%) translateY(16px); background: var(--ink); color: var(--bg);
+    padding: 11px 20px; border-radius: 24px; font-size: 14.5px; font-weight: 700;
+    opacity: 0; pointer-events: none; transition: all 0.25s ease; z-index: 60; white-space: nowrap; }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  details summary::-webkit-details-marker { color: var(--ink2); }
+</style>
+</head>
+<body>
+  <main id="app"></main>
+
+  <nav class="tabbar">
+    <button data-tab="today"><span>🏋️</span>Today</button>
+    <button data-tab="history"><span>📈</span>History</button>
+    <button data-tab="guide"><span>🧭</span>Guide</button>
+    <button data-tab="feedback"><span>💬</span>Feedback</button>
+  </nav>
+
+  <div id="toast"></div>
+
+  <script src="data.js"></script>
+  <script src="art.js"></script>
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+    }
+  </script>
+</body>
+</html>
