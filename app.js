@@ -20,7 +20,12 @@ function saveJSON(key, val) {
 }
 function clone(o) { return JSON.parse(JSON.stringify(o)); }
 
-let program  = loadJSON(K.program, null) || clone(DEFAULT_PROGRAM);
+let program  = loadJSON(K.program, null);
+if (!program || (program.version || 0) < PROGRAM_VERSION) {
+  // Template upgrade shipped: replace stored program (history/feedback untouched)
+  program = clone(DEFAULT_PROGRAM);
+  saveJSON(K.program, program);
+}
 let sessions = loadJSON(K.sessions, []);
 let feedback = loadJSON(K.feedback, []);
 let draft    = loadJSON(K.draft, null);

@@ -260,6 +260,30 @@ const ART = {
     <circle class="hd" cx="30" cy="50" r="4.5"/>
   </svg>`,
 
+  machinepress: `<svg viewBox="0 0 120 80" class="art" aria-hidden="true">
+    <line class="s" x1="48" y1="56" x2="48" y2="30"/>
+    <line class="s" x1="44" y1="56" x2="70" y2="56"/><line class="s" x1="58" y1="56" x2="58" y2="72"/>
+    <circle class="hd" cx="58" cy="22" r="4.5"/>
+    <line class="s" x1="58" y1="28" x2="58" y2="52"/>
+    <line class="a" x1="58" y1="32" x2="46" y2="16"/><line class="a" x1="58" y1="32" x2="70" y2="16"/>
+    <line class="s" x1="41" y1="15" x2="50" y2="15"/><line class="s" x1="66" y1="15" x2="75" y2="15"/>
+    <path class="s" d="M86,36 L100,36 L100,62 L86,62 Z"/>
+    <line class="s" x1="86" y1="45" x2="100" y2="45"/><line class="s" x1="86" y1="54" x2="100" y2="54"/>
+  </svg>`,
+
+  cablerow: `<svg viewBox="0 0 120 80" class="art" aria-hidden="true">
+    <path class="s" d="M14,36 L28,36 L28,62 L14,62 Z"/>
+    <line class="s" x1="14" y1="49" x2="28" y2="49"/>
+    <circle class="s" cx="33" cy="47" r="3"/>
+    <line class="a" x1="36" y1="47" x2="52" y2="45"/>
+    <circle class="hd" cx="68" cy="25" r="4.5"/>
+    <line class="s" x1="66" y1="31" x2="64" y2="52"/>
+    <line class="a" x1="65" y1="36" x2="52" y2="45"/>
+    <polyline class="s" points="64,52 84,55 90,49"/>
+    <line class="s" x1="90" y1="45" x2="94" y2="60"/>
+    <line class="s" x1="56" y1="58" x2="76" y2="58"/>
+  </svg>`,
+
   bar: `<svg viewBox="0 0 120 80" class="art" aria-hidden="true">
     <line class="a" x1="22" y1="44" x2="98" y2="44"/>
     <circle class="s" cx="32" cy="44" r="10"/><circle class="s" cx="88" cy="44" r="10"/>
