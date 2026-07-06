@@ -260,6 +260,187 @@ const ART = {
     <circle class="hd" cx="30" cy="50" r="4.5"/>
   </svg>`,
 
+  catcow: `<svg viewBox="0 0 120 80" class="art" aria-hidden="true">
+    <line class="gd" x1="20" y1="68" x2="100" y2="68"/>
+    <line class="s" x1="44" y1="48" x2="44" y2="66"/>
+    <line class="s" x1="76" y1="48" x2="76" y2="66"/>
+    <path class="a" d="M44,48 Q60,32 76,48"/>
+    <circle class="hd" cx="38" cy="54" r="4.5"/>
+  </svg>`,
+
+  anklerock: `<svg viewBox="0 0 120 80" class="art" aria-hidden="true">
+    <line class="gd" x1="26" y1="68" x2="98" y2="68"/>
+    <circle class="hd" cx="62" cy="24" r="4.5"/>
+    <line class="s" x1="62" y1="30" x2="66" y2="48"/>
+    <line class="s" x1="66" y1="48" x2="44" y2="50"/>
+    <line class="a" x1="44" y1="50" x2="50" y2="66"/>
+    <line class="s" x1="66" y1="48" x2="76" y2="66"/>
+    <line class="s" x1="76" y1="66" x2="90" y2="68"/>
+    <path class="a" d="M40,58 L33,60 M36,55 L33,60 L38,63"/>
+  </svg>`,
+
+  glutebridge: `<svg viewBox="0 0 120 80" class="art" aria-hidden="true">
+    <line class="gd" x1="20" y1="68" x2="100" y2="68"/>
+    <circle class="hd" cx="30" cy="61" r="4.5"/>
+    <line class="a" x1="36" y1="62" x2="64" y2="44"/>
+    <line class="s" x1="64" y1="44" x2="78" y2="48"/>
+    <line class="s" x1="78" y1="48" x2="78" y2="66"/>
+    <line class="s" x1="40" y1="64" x2="56" y2="66"/>
+  </svg>`,
+
+  deadbug: `<svg viewBox="0 0 120 80" class="art" aria-hidden="true">
+    <line class="gd" x1="20" y1="68" x2="100" y2="68"/>
+    <circle class="hd" cx="32" cy="60" r="4.5"/>
+    <line class="s" x1="38" y1="63" x2="66" y2="63"/>
+    <line class="a" x1="46" y1="61" x2="46" y2="38"/>
+    <line class="a" x1="66" y1="63" x2="78" y2="46"/>
+    <line class="a" x1="78" y1="46" x2="88" y2="52"/>
+    <polyline class="s" points="66,63 76,60 80,67"/>
+  </svg>`,
+
+  hipflexor: `<svg viewBox="0 0 120 80" class="art" aria-hidden="true">
+    <line class="gd" x1="26" y1="68" x2="98" y2="68"/>
+    <circle class="hd" cx="57" cy="19" r="4.5"/>
+    <line class="s" x1="58" y1="25" x2="60" y2="48"/>
+    <line class="a" x1="58" y1="28" x2="65" y2="11"/>
+    <line class="s" x1="60" y1="48" x2="45" y2="50"/>
+    <line class="s" x1="45" y1="50" x2="45" y2="66"/>
+    <line class="s" x1="60" y1="48" x2="73" y2="66"/>
+    <line class="s" x1="73" y1="66" x2="88" y2="68"/>
+  </svg>`,
+
+  deepsquat: `<svg viewBox="0 0 120 80" class="art" aria-hidden="true">
+    <line class="gd" x1="32" y1="70" x2="90" y2="70"/>
+    <circle class="hd" cx="56" cy="27" r="4.5"/>
+    <line class="s" x1="56" y1="32" x2="53" y2="47"/>
+    <line class="a" x1="53" y1="47" x2="70" y2="53"/>
+    <line class="a" x1="70" y1="53" x2="66" y2="69"/>
+    <line class="s" x1="55" y1="35" x2="74" y2="31"/>
+  </svg>`,
+
+  reach: `<svg viewBox="0 0 120 80" class="art" aria-hidden="true">
+    <line class="gd" x1="32" y1="72" x2="88" y2="72"/>
+    <circle class="hd" cx="67" cy="18" r="4.5"/>
+    <path class="s" d="M58,46 Q59,30 64,23"/>
+    <path class="a" d="M63,26 Q72,12 82,18"/>
+    <line class="s" x1="59" y1="38" x2="50" y2="46"/>
+    <line class="s" x1="58" y1="46" x2="52" y2="72"/>
+    <line class="s" x1="58" y1="46" x2="64" y2="72"/>
+  </svg>`,
+
+  kneeschest: `<svg viewBox="0 0 120 80" class="art" aria-hidden="true">
+    <line class="gd" x1="22" y1="68" x2="98" y2="68"/>
+    <circle class="hd" cx="36" cy="56" r="4.5"/>
+    <path class="s" d="M42,60 Q58,54 68,62"/>
+    <line class="a" x1="64" y1="60" x2="52" y2="44"/>
+    <line class="a" x1="52" y1="44" x2="42" y2="52"/>
+    <line class="s" x1="48" y1="58" x2="54" y2="46"/>
+  </svg>`,
+
+  figure4: `<svg viewBox="0 0 120 80" class="art" aria-hidden="true">
+    <line class="gd" x1="20" y1="68" x2="100" y2="68"/>
+    <circle class="hd" cx="30" cy="61" r="4.5"/>
+    <line class="s" x1="36" y1="64" x2="60" y2="64"/>
+    <line class="s" x1="60" y1="64" x2="72" y2="48"/>
+    <line class="s" x1="72" y1="48" x2="82" y2="58"/>
+    <line class="a" x1="72" y1="48" x2="58" y2="42"/>
+    <line class="a" x1="58" y1="42" x2="54" y2="47"/>
+  </svg>`,
+
+  hamstring: `<svg viewBox="0 0 120 80" class="art" aria-hidden="true">
+    <line class="gd" x1="20" y1="68" x2="100" y2="68"/>
+    <circle class="hd" cx="32" cy="59" r="4.5"/>
+    <line class="s" x1="38" y1="63" x2="62" y2="64"/>
+    <line class="a" x1="62" y1="64" x2="57" y2="33"/>
+    <line class="s" x1="62" y1="64" x2="88" y2="66"/>
+    <line class="s" x1="50" y1="58" x2="57" y2="42"/>
+  </svg>`,
+
+  pigeon: `<svg viewBox="0 0 120 80" class="art" aria-hidden="true">
+    <line class="gd" x1="22" y1="68" x2="100" y2="68"/>
+    <circle class="hd" cx="58" cy="26" r="4.5"/>
+    <line class="s" x1="58" y1="31" x2="53" y2="56"/>
+    <line class="a" x1="42" y1="63" x2="62" y2="58"/>
+    <line class="s" x1="56" y1="58" x2="88" y2="65"/>
+    <line class="s" x1="56" y1="40" x2="46" y2="58"/>
+  </svg>`,
+
+  openbook: `<svg viewBox="0 0 120 80" class="art" aria-hidden="true">
+    <line class="gd" x1="22" y1="68" x2="98" y2="68"/>
+    <circle class="hd" cx="40" cy="51" r="4.5"/>
+    <line class="s" x1="46" y1="54" x2="66" y2="58"/>
+    <line class="s" x1="66" y1="58" x2="78" y2="50"/>
+    <line class="s" x1="78" y1="50" x2="86" y2="60"/>
+    <line class="s" x1="48" y1="54" x2="32" y2="50"/>
+    <line class="a" x1="48" y1="54" x2="60" y2="32"/>
+  </svg>`,
+
+  childpose: `<svg viewBox="0 0 120 80" class="art" aria-hidden="true">
+    <line class="gd" x1="20" y1="68" x2="100" y2="68"/>
+    <line class="s" x1="66" y1="64" x2="82" y2="66"/>
+    <path class="s" d="M66,60 Q56,48 40,58"/>
+    <circle class="hd" cx="36" cy="55" r="4.5"/>
+    <line class="a" x1="38" y1="60" x2="24" y2="62"/>
+  </svg>`,
+
+  calfstretch: `<svg viewBox="0 0 120 80" class="art" aria-hidden="true">
+    <line class="s" x1="26" y1="12" x2="26" y2="70"/>
+    <line class="gd" x1="26" y1="70" x2="98" y2="70"/>
+    <circle class="hd" cx="36" cy="26" r="4.5"/>
+    <line class="s" x1="28" y1="36" x2="42" y2="34"/>
+    <line class="s" x1="42" y1="34" x2="58" y2="48"/>
+    <line class="s" x1="58" y1="48" x2="54" y2="68"/>
+    <line class="a" x1="58" y1="48" x2="78" y2="68"/>
+  </svg>`,
+
+  tibraise: `<svg viewBox="0 0 120 80" class="art" aria-hidden="true">
+    <line class="s" x1="94" y1="12" x2="94" y2="70"/>
+    <line class="gd" x1="26" y1="70" x2="94" y2="70"/>
+    <circle class="hd" cx="80" cy="21" r="4.5"/>
+    <line class="s" x1="83" y1="27" x2="88" y2="52"/>
+    <line class="s" x1="88" y1="52" x2="72" y2="68"/>
+    <line class="a" x1="72" y1="68" x2="64" y2="60"/>
+    <path class="a" d="M56,66 L56,56 M52,59 L56,56 L60,59"/>
+  </svg>`,
+
+  ninety: `<svg viewBox="0 0 120 80" class="art" aria-hidden="true">
+    <line class="gd" x1="22" y1="66" x2="100" y2="66"/>
+    <circle class="hd" cx="56" cy="22" r="4.5"/>
+    <line class="s" x1="56" y1="28" x2="57" y2="55"/>
+    <line class="a" x1="57" y1="56" x2="78" y2="56"/>
+    <line class="a" x1="78" y1="56" x2="86" y2="64"/>
+    <line class="s" x1="57" y1="56" x2="42" y2="60"/>
+    <line class="s" x1="42" y1="60" x2="32" y2="52"/>
+  </svg>`,
+
+  adductor: `<svg viewBox="0 0 120 80" class="art" aria-hidden="true">
+    <line class="gd" x1="20" y1="66" x2="102" y2="66"/>
+    <circle class="hd" cx="40" cy="38" r="4.5"/>
+    <line class="s" x1="46" y1="42" x2="68" y2="44"/>
+    <line class="s" x1="48" y1="42" x2="48" y2="64"/>
+    <line class="s" x1="66" y1="46" x2="66" y2="64"/>
+    <line class="a" x1="68" y1="44" x2="94" y2="62"/>
+  </svg>`,
+
+  wallslide: `<svg viewBox="0 0 120 80" class="art" aria-hidden="true">
+    <line class="s" x1="90" y1="10" x2="90" y2="70"/>
+    <line class="gd" x1="30" y1="70" x2="90" y2="70"/>
+    <circle class="hd" cx="77" cy="23" r="4.5"/>
+    <line class="s" x1="81" y1="29" x2="83" y2="55"/>
+    <line class="a" x1="81" y1="31" x2="87" y2="14"/>
+    <line class="s" x1="83" y1="55" x2="72" y2="70"/>
+    <line class="s" x1="83" y1="55" x2="82" y2="70"/>
+  </svg>`,
+
+  latstretch: `<svg viewBox="0 0 120 80" class="art" aria-hidden="true">
+    <line class="s" x1="28" y1="12" x2="28" y2="70"/>
+    <line class="gd" x1="28" y1="70" x2="98" y2="70"/>
+    <circle class="hd" cx="52" cy="26" r="4.5"/>
+    <line class="a" x1="30" y1="24" x2="56" y2="32"/>
+    <line class="s" x1="56" y1="32" x2="76" y2="44"/>
+    <line class="s" x1="76" y1="44" x2="80" y2="68"/>
+  </svg>`,
+
   machinepress: `<svg viewBox="0 0 120 80" class="art" aria-hidden="true">
     <line class="s" x1="48" y1="56" x2="48" y2="30"/>
     <line class="s" x1="44" y1="56" x2="70" y2="56"/><line class="s" x1="58" y1="56" x2="58" y2="72"/>

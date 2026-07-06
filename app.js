@@ -314,6 +314,7 @@ function render() {
   let html = '';
   if (view.name === 'today')    html = renderToday();
   if (view.name === 'workout')  html = renderWorkout();
+  if (view.name === 'stretch')  html = renderStretch();
   if (view.name === 'history')  html = renderHistory();
   if (view.name === 'guide')    html = renderGuide();
   if (view.name === 'feedback') html = renderFeedback();
@@ -433,7 +434,8 @@ function renderWorkout() {
   if (w.warmup) {
     const wu = ROUTINES.find(r => r.id === 'warmup');
     h += '<details class="card warmup"><summary>🔥 ' + esc(wu.name) + ' — non-negotiable</summary><ul>' +
-      wu.items.map(i => '<li>' + esc(i) + '</li>').join('') + '</ul></details>';
+      wu.items.map(i => '<li>' + esc(i.name + ' ' + i.dose) + '</li>').join('') +
+      '</ul><p class="sub">Full how-to with pictures on the 🧘 Stretch tab.</p></details>';
   }
 
   let lastLoc = null;
@@ -557,15 +559,37 @@ function renderGuide() {
   h += '<div class="kicker pad">Back-strain guardrails</div><section class="card"><ul class="plain">' +
     GUARDRAILS.map(g => '<li>' + esc(g) + '</li>').join('') + '</ul></section>';
 
-  h += '<div class="kicker pad">Routines</div>';
-  ROUTINES.forEach(r => {
-    h += '<details class="card routine"><summary><b>' + esc(r.name) + '</b><span class="sub"> · ' + esc(r.when) + '</span></summary><ul class="checks">' +
-      r.items.map((it, i) => '<li><label><input type="checkbox"> <span>' + esc(it) + '</span></label></li>').join('') +
-      '</ul></details>';
-  });
+  h += '<section class="card"><p class="sub" style="margin:0">🧘 The warm-up, morning, night, and Sunday routines — with pictures and how-tos — live on the <b>Stretch</b> tab.</p></section>';
+  h += '<div class="finishrow"><button class="btn ghost" data-act="restoredefaults">Restore default program</button></div>';
+  return h;
+}
+
+// ---- render: stretch --------------------------------------------------------
+function renderStretch() {
+  const now = new Date();
+  const hr = now.getHours();
+  const isSunday = monIdx(now) === 6;
+  let h = '<header class="page-head"><div><h1>Stretch &amp; Mobility</h1>' +
+    '<p class="sub">Tap through each routine — pictures, cues, and example videos</p></div></header>';
 
   h += '<section class="card hintcard">🦶 ' + esc(WALKING_CUE) + '</section>';
-  h += '<div class="finishrow"><button class="btn ghost" data-act="restoredefaults">Restore default program</button></div>';
+
+  ROUTINES.forEach(r => {
+    const open = (r.id === 'morning' && hr < 12) || (r.id === 'night' && hr >= 19) || (r.id === 'sunday' && isSunday);
+    h += '<details class="card routine"' + (open ? ' open' : '') + '><summary><b>' + esc(r.name) + '</b><span class="sub"> · ' + esc(r.when) + '</span></summary>';
+    let sec = null;
+    r.items.forEach(it => {
+      if (it.sec && it.sec !== sec) { sec = it.sec; h += '<div class="st-sec">' + esc(sec) + '</div>'; }
+      h += '<div class="st-item">' +
+        '<input type="checkbox" class="st-cb">' +
+        '<div class="exart st">' + artFor(it.art) + '</div>' +
+        '<div class="grow"><b>' + esc(it.name) + '</b><span class="st-dose">' + esc(it.dose) + '</span>' +
+        '<p class="st-tip">' + esc(it.tip) + '</p>' +
+        (it.video ? '<a class="vlink stv" href="' + esc(it.video) + '" target="_blank" rel="noopener">▶ example video</a>' : '') +
+        '</div></div>';
+    });
+    h += '</details>';
+  });
   return h;
 }
 
