@@ -1,7 +1,7 @@
 // ── Program data: seeds the editable program on first run ──────────────
 // Edit via the app (pencil icon); "Restore default program" re-loads this.
 
-const PROGRAM_VERSION = 4;
+const PROGRAM_VERSION = 5;
 const PROGRAM_START = '2026-07-06'; // Monday, week 1
 
 function yt(q) {
@@ -55,9 +55,6 @@ const DEFAULT_PROGRAM = {
         { id: 'chestrow',   name: 'Chest-Supported Machine Row', sets: 3, reps: '6–8',  rest: 120, art: 'chestrow',   loc: 'Lifetime',
           tip: 'Chest glued to the pad — zero low-back load. Squeeze the mid-back; last set RPE 9 is fair game.',
           video: yt('chest supported machine row form') },
-        { id: 'cablerow',   name: 'Single-Arm Cable Row',     sets: 3, reps: '8–10',    rest: 90,  art: 'cablerow',   loc: 'Lifetime',
-          tip: 'Seated or half-kneeling at the stack. Let the shoulder reach forward on the stretch, pull to the hip.',
-          video: yt('single arm cable row form') },
         { id: 'facepull',   name: 'Face Pull',                sets: 3, reps: '12',      rest: 60,  art: 'facepull',   loc: 'Lifetime',
           tip: 'Stays at 12 on purpose — it’s shoulder insurance for benching and hockey, not an ego lift. Rope to eyebrows, thumbs back.',
           video: yt('cable face pull form') },
