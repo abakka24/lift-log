@@ -178,7 +178,7 @@ function suggestFor(ex) {
     const w = Math.max(...real.map(s => parseFloat(s.w)));
     const top = real.filter(s => parseFloat(s.w) === w);
     const minR = Math.min(...top.map(s => parseInt(s.r, 10)));
-    const inc = ['squat', 'rdl', 'legpress'].indexOf(ex.id) >= 0 ? 10 : 5;
+    const inc = ['squat', 'rdl'].indexOf(ex.id) >= 0 ? 10 : 5;
     const gated = ['squat', 'rdl'].indexOf(ex.id) >= 0;
     if (minR >= hi) {
       if (gated && sessions[i].pain != null && sessions[i].pain > 2) {
@@ -440,6 +440,11 @@ function renderWorkout() {
 
   let lastLoc = null;
   w.exercises.forEach(ex => {
+    // Program may have been upgraded mid-draft: backfill entries for new exercises
+    if (!draft.entries[ex.id]) {
+      draft.entries[ex.id] = { sets: Array.from({ length: ex.sets }, () => ({ w: '', r: '', done: false })), note: '' };
+      saveDraft();
+    }
     if (ex.loc && ex.loc !== lastLoc) {
       if (lastLoc !== null) h += '<div class="locdiv">🚗 Drive to ' + esc(ex.loc) + '</div>';
       else if (w.where.indexOf('→') >= 0) h += '<div class="locdiv first">📍 ' + esc(ex.loc) + '</div>';

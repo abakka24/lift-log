@@ -1,7 +1,7 @@
 // ── Program data: seeds the editable program on first run ──────────────
 // Edit via the app (pencil icon); "Restore default program" re-loads this.
 
-const PROGRAM_VERSION = 3;
+const PROGRAM_VERSION = 4;
 const PROGRAM_START = '2026-07-06'; // Monday, week 1
 
 function yt(q) {
@@ -86,9 +86,9 @@ const DEFAULT_PROGRAM = {
         { id: 'rdl',        name: 'Romanian Deadlift',        sets: 3, reps: '8',       rest: 150, art: 'rdl',        loc: 'Garage',
           tip: 'Patterning, not PRs. Push hips back, feel hamstrings stretch, spine stays locked neutral. Form breaks = set over.',
           video: yt('romanian deadlift form') },
-        { id: 'legpress',   name: 'Leg Press',                sets: 3, reps: '6–8',     rest: 150, art: 'legpress',   loc: 'Lifetime',
-          tip: 'No spinal load — this is where you get to push hard. RPE 8–9, just don’t let the low back round off the pad at the bottom.',
-          video: yt('leg press form') },
+        { id: 'legext',     name: 'Leg Extension',            sets: 3, reps: '8–10',    rest: 90,  art: 'legext',     loc: 'Lifetime',
+          tip: 'Pure quad, zero spine — this is your heavy quad slot while the squat rehabs. 2-sec squeeze at the top, control the way down, last set near failure.',
+          video: yt('leg extension machine form') },
         { id: 'legcurl',    name: 'Seated Leg Curl',          sets: 3, reps: '8–10',    rest: 90,  art: 'legcurl',    loc: 'Lifetime',
           tip: 'Heavy but controlled — hamstrings grow on the way back up, and they protect your back and knees on the ice.',
           video: yt('seated leg curl form') },

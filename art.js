@@ -174,6 +174,17 @@ const ART = {
     <line class="s" x1="86" y1="30" x2="90" y2="70"/>
   </svg>`,
 
+  legext: `<svg viewBox="0 0 120 80" class="art" aria-hidden="true">
+    <line class="s" x1="44" y1="32" x2="44" y2="56"/>
+    <line class="s" x1="44" y1="56" x2="66" y2="56"/>
+    <line class="s" x1="56" y1="56" x2="56" y2="72"/>
+    <circle class="hd" cx="48" cy="25" r="4.5"/>
+    <line class="s" x1="48" y1="31" x2="48" y2="54"/>
+    <line class="s" x1="48" y1="54" x2="68" y2="54"/>
+    <line class="a" x1="68" y1="54" x2="84" y2="43"/>
+    <line class="s" x1="82" y1="40" x2="88" y2="48"/>
+  </svg>`,
+
   legcurl: `<svg viewBox="0 0 120 80" class="art" aria-hidden="true">
     <line class="s" x1="44" y1="32" x2="44" y2="56"/>
     <line class="s" x1="44" y1="56" x2="66" y2="56"/>
