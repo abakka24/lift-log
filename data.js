@@ -1,7 +1,7 @@
 // ── Program data: seeds the editable program on first run ──────────────
 // Edit via the app (pencil icon); "Restore default program" re-loads this.
 
-const PROGRAM_VERSION = 5;
+const PROGRAM_VERSION = 6;
 const PROGRAM_START = '2026-07-06'; // Monday, week 1
 
 function yt(q) {
@@ -35,7 +35,7 @@ const DEFAULT_PROGRAM = {
           tip: 'Elbows pinned to your sides. Split the rope at the bottom and squeeze.',
           video: yt('triceps rope pushdown form') },
         { id: 'cablecrunch', name: 'Cable Crunch',            sets: 3, reps: '12',      rest: 60,  art: 'cablecrunch', loc: 'Lifetime', core: true,
-          tip: 'Kneel, hips stay still — crunch ribs toward pelvis. Flex the abs, don’t pull with arms.',
+          tip: 'Kneel, hips stay still — crunch ribs toward pelvis, don’t pull with arms. Short on time? Slot these into your bench rest periods instead of saving them for the end.',
           video: yt('kneeling cable crunch form') },
         { id: 'birddog',    name: 'Bird Dog',                 sets: 2, reps: '8/side',  rest: 45,  art: 'birddog',    loc: 'Lifetime', core: true,
           tip: 'Your low-back rebuild staple. Slow, 2-sec pause, hips stay level — pretend a cup of water is on your back.',
@@ -62,10 +62,10 @@ const DEFAULT_PROGRAM = {
           tip: 'Cable EZ-bar or preacher machine — constant tension, no swing. Last set near failure.',
           video: yt('cable curl form') },
         { id: 'backext',    name: '45° Back Extension',       sets: 3, reps: '12',      rest: 60,  art: 'backext',    loc: 'Lifetime', core: true,
-          tip: 'THE low-back strengthener. Bodyweight first, add a light plate when smooth. Squeeze glutes at the top, never jerk.',
+          tip: 'THE low-back strengthener — but it’s rehab, not a max lift. Pad height where you found the back connection. Squeeze glutes, never jerk, and leave 2–3 reps in the tank for now; near-failure comes after the back has been quiet a few weeks.',
           video: yt('45 degree back extension form') },
         { id: 'pallof',     name: 'Pallof Press',             sets: 2, reps: '10/side', rest: 45,  art: 'pallof',     loc: 'Lifetime', core: true,
-          tip: 'Anti-rotation: press out slow, resist the cable twisting you. Ribs stacked over hips.',
+          tip: 'Press out slow, resist the twist. Step closer to the stack, soften the knees, ribs down — you should feel abs/obliques, NEVER a stretch at the low back. Any L5-S1 sensation → shorten the press-out or go half-kneeling. Grippy shoes.',
           video: yt('pallof press form') },
       ],
     },
