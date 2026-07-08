@@ -137,10 +137,10 @@ const SCHEDULE = {
   week1: [
     { day: 0, workout: 'push', label: 'Push', where: 'Lifetime' },
     { day: 1, workout: 'pull', label: 'Pull', where: 'Lifetime' },
-    { day: 2, workout: 'legs', label: 'Legs', where: 'Garage → Lifetime' },
+    { day: 2, workout: null,   label: 'Rest — recover, night routine', where: 'Home' },
     { day: 3, workout: null,   label: 'Rest + ankle/hip mobility', where: 'Home' },
     { day: 4, workout: 'oly',  label: 'Oly + Explosive', where: 'Garage' },
-    { day: 5, workout: null,   label: 'Optional zone-2 or full rest', where: '—' },
+    { day: 5, workout: 'legs', label: 'Legs', where: 'Garage → Lifetime' },
     { day: 6, workout: null,   label: 'Sunday mobility session', where: 'Home' },
   ],
   week2plus: [
